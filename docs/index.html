@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="个人简历与项目">
+  <title>个人简历与项目</title>
+  <link rel="stylesheet" href="./style.css">
+  <script defer src="./resume.js"></script>
+  <script defer src="./render.js"></script>
+  <script defer src="./motion/three-0.150.1.min.js"></script>
+  <script defer src="./motion/fluid.js"></script>
+  <script defer src="./motion/particles.js"></script>
+  <script defer src="./motion/gradient-ascii.js"></script>
+  <script defer src="./motion/poster-points.js"></script>
+  <script defer src="./motion/motion-canvas.js"></script>
+  <script defer src="./motion/motion.js"></script>
+</head>
+<body data-view="portfolio">
+  <div class="motion-surface" aria-hidden="true">
+    <canvas class="gradient-ascii"></canvas>
+    <canvas class="particle-canvas" id="particles-webgl"></canvas>
+    <canvas class="particle-canvas" id="particles-canvas"></canvas>
+  </div>
+  <p id="load-message" class="load-message" role="status">正在加载简历。请确认 resume.js 和 render.js 与此页面位于同一目录，且浏览器已启用 JavaScript。</p>
+  <a id="skip" class="skip" href="#profile" hidden></a>
+  <header id="site-head" class="site-head" hidden>
+    <a class="brand" href="#profile"></a>
+    <div class="head-actions">
+      <button class="motion-toggle" id="motion-toggle" type="button" hidden></button>
+      <a class="print-link" href="./resume.html"></a>
+    </div>
+  </header>
+  <main class="layout" hidden>
+    <section class="work" id="work" aria-labelledby="work-title" tabindex="-1" hidden>
+      <h2 class="label" id="work-title"></h2>
+      <div class="filters" role="group" hidden></div>
+      <p id="filter-status" class="sr-only" role="status"></p>
+      <div class="project-scroll" role="region" tabindex="0"></div>
+    </section>
+    <div class="profile-panel">
+      <nav class="profile-nav"></nav>
+      <div class="profile-scroll" role="region" tabindex="0"></div>
+    </div>
+  </main>
+</body>
+</html>

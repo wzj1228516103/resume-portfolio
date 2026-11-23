@@ -1,0 +1,219 @@
+:root {
+  color-scheme: dark;
+  --paper: #fff;
+  --ink: #211d2a;
+  --muted: #5d5767;
+  --accent: #6243ab;
+  --rule: #dcd5eb;
+  --lavender: #aa88ff;
+  --body-font: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+  --mono-font: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+:root:lang(en) { --body-font: system-ui, sans-serif; }
+:root:lang(zh-TW) { --body-font: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", system-ui, sans-serif; }
+:root:lang(ja) { --body-font: "Yu Gothic UI", "Hiragino Sans", "Noto Sans CJK JP", system-ui, sans-serif; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #09080d;
+  color: #eee9f5;
+  font: 10.25pt/1.42 var(--body-font);
+}
+
+h1, h2, h3, p, dl, dd { margin: 0; }
+[hidden] { display: none !important; }
+.sheet { overflow-wrap: anywhere; }
+
+a { color: inherit; text-underline-offset: .17em; }
+
+a:focus-visible, button:focus-visible, select:focus-visible {
+  outline: 2px solid var(--lavender);
+  outline-offset: 4px;
+}
+
+.toolbar, .sheet {
+  width: min(calc(100% - 32px), 210mm);
+  margin-inline: auto;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 18px;
+}
+
+.toolbar a { color: var(--lavender); }
+
+.toolbar button, .toolbar select {
+  border: 1px solid #55436f;
+  padding: 8px 13px;
+  background: #191324;
+  color: #f0e9ff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.toolbar button:hover, .toolbar select:hover { border-color: var(--lavender); }
+
+.sheet {
+  color-scheme: light;
+  min-height: 297mm;
+  margin-block-end: 26px;
+  padding: 13mm 16mm;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.identity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) fit-content(42%);
+  grid-template-areas: "person contact";
+  align-items: end;
+  gap: 1.2mm 3mm;
+  padding-block-end: 4mm;
+  border-bottom: 1.5pt solid var(--accent);
+}
+
+.identity-copy { grid-area: person; }
+
+.identity address { grid-area: contact; }
+
+h1 {
+  font-size: 26pt;
+  letter-spacing: -.035em;
+  line-height: 1.08;
+}
+
+.role {
+  margin-block-start: 2mm;
+  font-size: 11pt;
+  font-weight: 650;
+}
+
+address, .entry-link {
+  color: var(--accent);
+  font-style: normal;
+  font-size: 8.75pt;
+  overflow-wrap: anywhere;
+}
+
+address a, .entry-link a { font-family: var(--mono-font); }
+
+.summary {
+  margin-block-start: 3.5mm;
+  color: var(--muted);
+}
+.summary + .summary { margin-block-start: 1.6mm; }
+.load-message { margin: 20px; }
+address a, address span { display: block; }
+
+.sheet section { margin-block-start: 4.5mm; }
+
+h2 {
+  margin-block-end: 2.1mm;
+  padding-block-end: .8mm;
+  border-bottom: .65pt solid var(--rule);
+  color: var(--accent);
+  font-size: 12pt;
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 10.75pt;
+  line-height: 1.35;
+}
+
+.entry + .entry { margin-block-start: 2.6mm; }
+
+.entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .4rem 1rem;
+}
+
+.date {
+  max-width: 100%;
+  color: var(--muted);
+  font: 9.25pt/1.45 var(--mono-font);
+}
+
+.context {
+  margin-block-start: .35mm;
+  color: var(--muted);
+  font-size: 9.25pt;
+}
+
+.entry ul {
+  margin: .55mm 0 0;
+  padding-inline-start: 1.35em;
+}
+
+.entry li + li { margin-block-start: .3mm; }
+
+.entry > h3 + p, .entry-link { margin-block-start: .5mm; }
+
+.related-projects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .1rem .7rem;
+}
+
+.related-projects span { color: var(--muted); }
+
+.skills {
+  display: grid;
+  grid-template-columns: fit-content(35%) minmax(0, 1fr);
+  gap: .4mm 3mm;
+}
+
+.skills dt { font-weight: 650; }
+
+.skills dd { overflow-wrap: anywhere; }
+
+@media screen and (max-width: 620px) {
+  .sheet {
+    min-height: auto;
+    padding: 22px clamp(16px, 5vw, 26px);
+  }
+
+  .entry-head { flex-wrap: wrap; }
+
+  .identity {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "person" "contact";
+    align-items: center;
+  }
+}
+
+@page { size: A4; margin: 10mm 13mm; }
+
+@media print {
+  :root { color-scheme: light; }
+
+  body { background: #fff; font-size: 10pt; line-height: 1.37; }
+
+  .toolbar { display: none; }
+
+  .sheet {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .identity { padding-block-end: 3mm; }
+  .summary { margin-block-start: 3mm; }
+  .sheet section { margin-block-start: 3mm; }
+  .entry + .entry { margin-block-start: 2mm; }
+  h2 { margin-block-end: 1.5mm; break-after: avoid; }
+
+  .entry, .identity { break-inside: avoid; }
+}

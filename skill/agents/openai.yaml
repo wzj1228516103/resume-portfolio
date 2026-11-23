@@ -1,0 +1,4 @@
+interface:
+  display_name: "个人简历网站"
+  short_description: "将简历转换为带项目展示和 A4 打印版的个人网站，从同一份数据生成两个页面"
+  default_prompt: "用 $resume-portfolio 把我提供的简历做成个人网站，并保留 A4 打印版。"

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A4 个人简历">
+  <title>A4 个人简历</title>
+  <link rel="stylesheet" href="./resume-print.css">
+  <script defer src="./resume.js"></script>
+  <script defer src="./render.js"></script>
+</head>
+<body data-view="print">
+  <p id="load-message" class="load-message" role="status">正在加载简历。请确认 resume.js 和 render.js 与此页面位于同一目录，且浏览器已启用 JavaScript。</p>
+  <nav class="toolbar" hidden>
+    <a href="./index.html"></a>
+    <button type="button"></button>
+  </nav>
+  <main class="sheet" hidden></main>
+</body>
+</html>
