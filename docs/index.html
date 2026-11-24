@@ -7,8 +7,14 @@
   <meta name="description" content="个人简历与项目">
   <title>个人简历与项目</title>
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./chat.css">
   <script defer src="./resume.js"></script>
   <script defer src="./render.js"></script>
+  <script defer src="./chat-config.js"></script>
+  <script defer src="./chat-marked.js"></script>
+  <script defer src="./chat-markdown.js"></script>
+  <script defer src="./chat-challenge.js"></script>
+  <script defer src="./chat.js"></script>
   <script defer src="./motion/three-0.150.1.min.js"></script>
   <script defer src="./motion/fluid.js"></script>
   <script defer src="./motion/particles.js"></script>
@@ -44,5 +50,28 @@
       <div class="profile-scroll" role="region" tabindex="0"></div>
     </div>
   </main>
+  <section class="chat-answer-region" id="chat-answer-region" aria-label="AI 回答" hidden>
+    <div class="chat-answer-output" id="chat-answer-output" tabindex="0">
+      <div class="chat-answer-draft" id="chat-answer-draft"></div>
+      <div class="chat-answer-markdown" id="chat-answer-markdown" hidden></div>
+    </div>
+  </section>
+  <footer class="chat-footer" id="chat-footer" aria-label="AI 问答" hidden>
+    <form class="chat-entry" id="chat-entry">
+      <div class="chat-feedback">
+        <div class="chat-challenge" id="chat-challenge" hidden></div>
+        <p class="chat-status" id="chat-status" role="status">问答服务尚未接入。</p>
+      </div>
+      <div class="chat-compose">
+        <span class="chat-compose-ai" aria-hidden="true">AI</span>
+        <label class="sr-only" id="chat-input-label" for="chat-input">询问项目或经历</label>
+        <input id="chat-input" type="text" placeholder="询问项目或经历" aria-describedby="chat-status" maxlength="1500" enterkeyhint="send" autocomplete="off" required disabled>
+        <button class="chat-icon" id="chat-clear" type="button" aria-label="关闭回答" hidden>×</button>
+        <button class="chat-icon chat-stop" id="chat-stop" type="button" aria-label="停止回答" hidden>■</button>
+        <button class="chat-icon chat-send" id="chat-send" type="submit" aria-label="发送" disabled>↑</button>
+      </div>
+    </form>
+    <p class="sr-only" id="chat-announcement" role="status"></p>
+  </footer>
 </body>
 </html>
