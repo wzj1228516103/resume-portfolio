@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.*
+!.env.example
+/knowledge/
+/public-rag/*
+!/public-rag/example-profile.md
+/data/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.log
+*.pem
+*.key
+.DS_Store

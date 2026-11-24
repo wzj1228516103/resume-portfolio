@@ -1,0 +1,28 @@
+{
+  "name": "portfolio-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "A configurable portfolio and document Q&A service with streaming responses.",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --watch src/index.ts",
+    "start": "node --env-file-if-exists=.env src/index.ts",
+    "site": "node --env-file-if-exists=.env src/site.ts",
+    "chat": "node --env-file-if-exists=.env src/chat-client.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node scripts/public-budget.ts && node scripts/public-access-http.ts && node scripts/site-http.ts"
+  },
+  "dependencies": {
+    "@earendil-works/pi-agent-core": "1.5.2",
+    "@earendil-works/pi-ai": "1.5.2",
+    "@earendil-works/pi-schema": "1.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "typescript": "7.0.2"
+  }
+}
