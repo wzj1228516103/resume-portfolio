@@ -14,7 +14,7 @@ export interface ChatSession {
 	lastUsedAt: number;
 	busy: boolean;
 	/** Most recent completed public reply, including local replies and rewrites. */
-	lastPublicReply?: string;
+	lastPublicReply?: { readonly text: string; readonly sources: readonly string[] };
 	/** Latest standalone factual question for short referential follow-ups. */
 	publicTopicQuestion?: string;
 }

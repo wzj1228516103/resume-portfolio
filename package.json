@@ -5,11 +5,18 @@
   "engines": {
     "node": ">=22.19.0"
   },
-  "workspaces": ["agent"],
+  "workspaces": [
+    "agent"
+  ],
   "scripts": {
     "start": "npm run site --workspace portfolio-agent",
     "agent": "npm run start --workspace portfolio-agent",
-    "test": "npm test --workspace portfolio-agent",
+    "export:public": "node scripts/export-public-profile.mjs",
+    "test": "node --test scripts/export-public-profile.test.mjs && npm test --workspace portfolio-agent",
+    "test:browser": "node scripts/browser-smoke.mjs",
     "typecheck": "npm run typecheck --workspace portfolio-agent"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1"
   }
 }

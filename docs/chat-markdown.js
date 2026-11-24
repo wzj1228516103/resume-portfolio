@@ -37,16 +37,11 @@
     return text.replace(/&([a-z]{2,6});/gi, (entity, name) => entities.get(name.toLowerCase()) ?? entity);
   }
 
-  function webLink(href) {
-    if (!href || /[\u0000-\u001f\u007f\\]/u.test(href) || href.startsWith("//")) return null;
-    if (/^(?:\.\/)?published\//u.test(href)) return null;
-    const absolute = /^https?:\/\//i.test(href);
-    if (!absolute && /^[^/?#]*[:&%]/u.test(href)) return null;
+  function httpsLink(href) {
+    if (typeof href !== "string" || !/^https:\/\//iu.test(href) || /[\s\\]/u.test(href)) return null;
     try {
-      const url = new URL(href, document.baseURI);
-      if ((url.protocol !== "https:" && url.protocol !== "http:") || url.username || url.password) return null;
-      if (!absolute && url.origin !== new URL(document.baseURI).origin) return null;
-      return absolute ? url.href : href;
+      const url = new URL(href);
+      return url.protocol === "https:" && !url.username && !url.password ? url.href : null;
     } catch {
       return null;
     }
@@ -153,7 +148,8 @@
             addCitation(parent, index, token.href, labels);
             break;
           }
-          const href = source ? sourceHref(source) : webLink(token.href);
+          const approved = httpsLink(token.href);
+          const href = source ? sourceHref(source) : labels.sources.has(approved) ? approved : null;
           appendTokens(href ? addLink(parent, href) : parent, token.tokens, labels);
           break;
         }
@@ -167,9 +163,10 @@
     }
   }
 
-  function renderAnswerMarkdown(source, labels = {}) {
+  function renderAnswerMarkdown(source, labels = {}, approvedSources = []) {
     const fragment = document.createDocumentFragment();
-    appendTokens(fragment, lexer.lexer(source), labels);
+    const sources = new Set(Array.isArray(approvedSources) ? approvedSources.map(httpsLink).filter(Boolean) : []);
+    appendTokens(fragment, lexer.lexer(source), { ...labels, sources });
     return fragment;
   }
   window.renderPortfolioAnswer = renderAnswerMarkdown;

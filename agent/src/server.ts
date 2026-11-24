@@ -21,7 +21,7 @@ import {
 } from "./errors.ts";
 import { KnowledgeBase, type KnowledgeStats } from "./knowledge/knowledge-base.ts";
 import { buildPrefetch, isPublicReferentialQuestion } from "./knowledge/prefetch.ts";
-import { PUBLIC_RAG_SOURCES } from "./knowledge/public-sources.ts";
+import { loadPublicSources } from "./knowledge/public-sources.ts";
 import { createKnowledgeSearchTool } from "./knowledge/tool.ts";
 import { createModelSetup } from "./models.ts";
 import { ChallengeUnavailableError, PublicAccess } from "./public-access.ts";
@@ -75,14 +75,15 @@ export async function startServer(config: ServiceConfig): Promise<AgentService> 
 	const publicAccess = config.publicAccess && new PublicAccess(config.publicAccess);
 
 	const setup = createModelSetup(config.providerId, config.modelId);
+	const approvedSources = config.publicPortfolio ? await loadPublicSources(config.publicSourcesFile) : undefined;
 	const knowledge = new KnowledgeBase(config.knowledgeDir, {
 		sourcePrefix: knowledgeSourcePrefix(config.workspaceRoot, config.knowledgeDir),
 		exclude: config.knowledgeExclude,
-		approvedSources: config.publicPortfolio ? PUBLIC_RAG_SOURCES : undefined,
+		approvedSources,
 	});
 	const knowledgeStats = await knowledge.rebuild();
-	if (config.publicPortfolio && knowledgeStats.chunks === 0) {
-		throw new Error("Public portfolio mode requires an indexed public knowledge base.");
+	if (approvedSources && (knowledgeStats.chunks === 0 || knowledgeStats.documents !== approvedSources.size)) {
+		throw new Error("Public portfolio mode requires every approved source to be present, readable, and nonempty. Check the public knowledge directory and allowlist.");
 	}
 	const tools = config.publicPortfolio ? [] : [createKnowledgeSearchTool(knowledge)];
 	const prefetch =
@@ -348,7 +349,9 @@ export async function startServer(config: ServiceConfig): Promise<AgentService> 
 				});
 				session.publicTopicQuestion = message.trim().slice(0, 160);
 			}
-			if (local?.kind !== "history_only" && local?.kind !== "history_recall") session.lastPublicReply = localReply.text;
+			if (local?.kind !== "history_only" && local?.kind !== "history_recall") {
+				session.lastPublicReply = { text: localReply.text, sources: faq?.sources ?? [] };
+			}
 			session.lastUsedAt = timestamp;
 			const write = openEventStream(response);
 			write({ type: "delta", text: localReply.text });
@@ -398,14 +401,14 @@ export async function startServer(config: ServiceConfig): Promise<AgentService> 
 		} : undefined;
 		let outcome: "completed" | "failed" | "aborted" = "failed";
 		let stopReason: string | undefined;
-		const emptyRetrieval = { sources: [], characters: 0 };
+		const historyRetrieval = historyPrompt ? { sources: previousReply?.sources ?? [], characters: 0 } : undefined;
 		let retrievalCharacters: number | undefined = historyPrompt ? 0 : undefined;
 		let retrievalChunks: number | undefined = historyPrompt ? 0 : undefined;
 
 		const previousUser = publicBudget ? session.agent.state.messages.findLast((item) => item.role === "user") : undefined;
 		const previousQuestion = userMessageText(previousUser);
 		const write = openEventStream(response);
-		const promptMessage = rewrite ? JSON.stringify({ request: message, previousAnswer: previousReply })
+		const promptMessage = rewrite ? JSON.stringify({ request: message, previousAnswer: previousReply.text })
 			: historyPrompt ? JSON.stringify({ request: message, recentQuestions }) : message;
 
 		try {
@@ -420,7 +423,7 @@ export async function startServer(config: ServiceConfig): Promise<AgentService> 
 				signal,
 				onComplete: publicBudget ? ({ text, retrieval }) => {
 					if (text.trim()) {
-						session.lastPublicReply = text;
+						session.lastPublicReply = { text, sources: (historyRetrieval ?? retrieval)?.sources ?? [] };
 						if (!historyPrompt && retrieval?.sources.length && !isPublicReferentialQuestion(message)) {
 							session.publicTopicQuestion = message.trim().slice(0, 160);
 						}
@@ -440,12 +443,13 @@ export async function startServer(config: ServiceConfig): Promise<AgentService> 
 			});
 			outcome = "completed";
 			stopReason = result.stopReason;
-			const retrieval = historyPrompt ? emptyRetrieval : result.retrieval;
-			retrievalCharacters = retrieval?.characters;
-			retrievalChunks = retrieval?.sources.length;
+			if (!historyPrompt) {
+				retrievalCharacters = result.retrieval?.characters;
+				retrievalChunks = result.retrieval?.sources.length;
+			}
 			if (config.publicPortfolio) {
 				const { text, stopReason } = result;
-				write({ type: "done", sessionId: session.id, text, stopReason, retrieval });
+				write({ type: "done", sessionId: session.id, text, stopReason, retrieval: historyRetrieval ?? result.retrieval });
 			} else {
 				write({ type: "done", sessionId: session.id, ...result });
 			}

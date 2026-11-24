@@ -18,6 +18,7 @@
   const english = /^en(?:-|$)/i.test(document.documentElement.lang);
   const copy = english ? {
     title: "AI chat", answer: "AI reply", clear: "Close reply", stop: "Stop reply",
+    source: "Source", portfolio: "Portfolio", resume: "Résumé",
     prompt: "Ask about projects or experience", send: "Send",
     offline: "The AI chat service is not connected yet.",
     config: "The AI chat configuration is incomplete.",
@@ -26,6 +27,7 @@
     stopped: "Reply stopped.", empty: "No reply was received.", complete: "Reply complete."
   } : {
     title: "AI 问答", answer: "AI 回答", clear: "关闭回答", stop: "停止回答",
+    source: "来源", portfolio: "作品集", resume: "简历",
     prompt: "询问项目或经历", send: "发送",
     offline: "AI 问答服务尚未接入。",
     config: "AI 问答配置未完成。",
@@ -79,7 +81,7 @@
     clear.hidden = true;
   }
 
-  function showAnswer(text, final = false) {
+  function showAnswer(text, final) {
     if (!text.trim()) return;
     const follow = region.hidden || output.scrollHeight - output.scrollTop - output.clientHeight < 36;
     region.hidden = false;
@@ -87,7 +89,7 @@
     draft.textContent = text;
     if (final && window.renderPortfolioAnswer) {
       try {
-        markdown.replaceChildren(window.renderPortfolioAnswer(text));
+        markdown.replaceChildren(window.renderPortfolioAnswer(text, copy, final.retrieval?.sources));
         if (markdown.textContent.trim()) {
           markdown.hidden = false;
           draft.hidden = true;
@@ -193,7 +195,7 @@
       });
       if (typeof final.sessionId === "string") sessionId = final.sessionId;
       if (typeof final.text === "string" && final.text.trim()) text = final.text;
-      showAnswer(text, true);
+      showAnswer(text, final);
       status.textContent = text.trim() ? "" : copy.empty;
       if (text.trim()) announcement.textContent = copy.complete;
     } catch {

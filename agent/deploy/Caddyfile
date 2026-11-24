@@ -1,0 +1,19 @@
+{$PORTFOLIO_API_HOST} {
+	@portfolioChat {
+		path /chat/stream /chat/access
+		method POST OPTIONS
+		header Origin {$PUBLIC_PORTFOLIO_ORIGIN}
+	}
+
+	handle @portfolioChat {
+		# Caddy streams text/event-stream responses immediately.
+		reverse_proxy 127.0.0.1:{$PORT:8787} {
+			header_up Authorization "Bearer {env.API_TOKEN}"
+			header_up X-Real-IP {http.request.remote.host}
+		}
+	}
+
+	handle {
+		respond 404
+	}
+}
