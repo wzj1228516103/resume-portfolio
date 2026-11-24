@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="三分钟原站导览，演示项目浏览、互动粒子、A4 简历和 AI 问答。">
+  <title>原站导览 · Resume Portfolio</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0;
+      background: #0e0a14;
+      color: #f3eef9;
+      font: 16px/1.65 "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    }
+    main { width: min(1080px, calc(100% - 36px)); margin: 26px auto 48px; }
+    h1 { margin: 18px 0 4px; font-size: clamp(28px, 5vw, 44px); line-height: 1.2; }
+    p { margin: 8px 0 20px; color: #c8bed4; }
+    a { color: #d1b7ff; text-underline-offset: 4px; }
+    a:focus-visible, video:focus-visible { outline: 2px solid #d1b7ff; outline-offset: 4px; }
+    video {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 1px solid #473756;
+      border-radius: 14px;
+      background: #08060b;
+    }
+    footer { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 18px; }
+  </style>
+</head>
+<body>
+  <main>
+    <a href="../index.html">← 开源模板</a>
+    <h1 id="showcase-title">个人网站导览</h1>
+    <p>3 分 11 秒 · 中文配音和字幕 · 项目浏览、A4 简历和 AI 问答</p>
+    <video controls playsinline preload="metadata" poster="./cover.webp" aria-labelledby="showcase-title">
+      <source src="https://github.com/wzj1228516103/resume-portfolio/releases/download/v0.3.0/portfolio-intro.mp4" type="video/mp4">
+      <a href="https://github.com/wzj1228516103/resume-portfolio/releases/download/v0.3.0/portfolio-intro.mp4">下载视频</a>
+    </video>
+    <footer>
+      <a href="https://github.com/wzj1228516103/resume-portfolio/releases/download/v0.3.0/portfolio-intro.mp4">下载 MP4</a>
+      <a href="https://github.com/wzj1228516103/resume-portfolio/generate">用这个模板创建作品集</a>
+    </footer>
+  </main>
+</body>
+</html>

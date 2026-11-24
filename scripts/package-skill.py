@@ -21,7 +21,9 @@ def main():
     skill = root / "skill"
     site_files = sorted(
         path for path in site.rglob("*")
-        if path.is_file() and not any(part.startswith(".") for part in path.relative_to(site).parts)
+        if path.is_file()
+        and path.relative_to(site).parts[0] != "showcase"
+        and not any(part.startswith(".") for part in path.relative_to(site).parts)
     )
 
     with ZipFile(output, "w", compression=ZIP_DEFLATED) as archive:

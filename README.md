@@ -4,7 +4,13 @@
 
 [打开演示](https://wzj1228516103.github.io/resume-portfolio/) · [预览 A4 简历](https://wzj1228516103.github.io/resume-portfolio/resume.html) · [使用此模板](https://github.com/wzj1228516103/resume-portfolio/generate) · [下载 Codex Skill](https://github.com/wzj1228516103/resume-portfolio/releases/latest)
 
-![Resume Portfolio 桌面预览，左边是项目卡片，中间是粒子背景，右边是简历](screenshots/desktop.png)
+## 🎬 观看原站导览
+
+[![原站视频封面，展示项目卡片、中央粒子和右侧简历，点击播放](docs/showcase/cover.webp)](https://wzj1228516103.github.io/resume-portfolio/showcase/index.html)
+
+[▶ 播放介绍视频](https://wzj1228516103.github.io/resume-portfolio/showcase/index.html) · **3 分 11 秒** · 中文配音和字幕
+
+视频从原站的三栏布局出发，演示互动粒子、项目浏览、A4 简历、AI 追问和手机端。想用同一套框架做自己的作品集，可以从虚构示例开始。[试用开源模板](https://wzj1228516103.github.io/resume-portfolio/)
 
 ## 快速开始
 
@@ -28,6 +34,8 @@ npm start
 示例资料来自 [`agent/public-rag/example-profile.md`](agent/public-rag/example-profile.md)。可在 `agent/.env` 中用 `KNOWLEDGE_DIR` 指向自己的资料目录。Agent 会将检索到的片段随问题发送给配置的模型服务。[后端配置和 API 说明](agent/README.md)
 
 ## 页面预览
+
+![Resume Portfolio 桌面预览，左边是项目卡片，中间是粒子背景，右边是简历](screenshots/desktop.png)
 
 ### 项目筛选和详情
 
