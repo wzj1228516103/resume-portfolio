@@ -38,6 +38,8 @@ try {
   await page.goto(site.url);
   assert.match(await page.locator("h1").innerText(), /林予安/u);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  const followUps = page.getByRole("group", { name: "你还可以问" });
+  assert.equal(await followUps.isVisible(), false);
   const ask = async () => {
     await page.locator("#chat-input").fill("岸线协作台里，设计师负责什么？");
     await page.locator("#chat-input").press("Enter");
@@ -49,20 +51,62 @@ try {
   assert.match(await markdown.innerText(), /本地资料/u);
   assert.equal(await markdown.locator("a").count(), 0);
   assert.equal(modelCalls, 1);
+  const buttons = followUps.getByRole("button");
+  assert.equal(await buttons.count(), 3);
+  const question = await buttons.first().innerText();
 
   const approved = "https://portfolio.example/project";
-  await page.route("**/chat/stream", route => route.fulfill({
+  const citeReply = route => route.fulfill({
     contentType: "text/event-stream",
     body: "data: " + JSON.stringify({
       type: "done",
       text: `来源 [1](${approved}) 和 [2](https://other.example/unapproved)`,
       retrieval: { sources: [approved] }
     }) + "\n\n"
-  }));
-  await ask();
+  });
+  await page.route("**/chat/stream", citeReply);
+  const followUpRequest = page.waitForRequest(request => new URL(request.url()).pathname === "/chat/stream");
+  await buttons.first().press("Enter");
+  const followUpBody = (await followUpRequest).postDataJSON();
+  assert.equal(followUpBody.message, question);
+  assert.equal(typeof followUpBody.sessionId, "string");
+  assert.ok(followUpBody.sessionId);
+  await markdown.waitFor({ state: "visible" });
   assert.equal(await markdown.locator("a").count(), 1);
   assert.equal(await markdown.locator("a").getAttribute("href"), approved);
   assert.match(await markdown.innerText(), /2/u);
+  assert.equal(await followUps.getByRole("button", { name: question, exact: true }).count(), 0);
+  await page.getByRole("button", { name: "关闭回答" }).click();
+  assert.equal(await followUps.isVisible(), false);
+
+  let customQuestions = ["你怎样改进岸线协作台？", "你怎样改进岸线协作台", "   "];
+  await page.route("**/resume.js", async route => {
+    const response = await route.fetch();
+    await route.fulfill({
+      contentType: "text/javascript; charset=utf-8",
+      body: await response.text() + "\nwindow.RESUME.followUpQuestions = " + JSON.stringify(customQuestions) + ";\n"
+    });
+  });
+  await page.reload();
+  await ask();
+  assert.deepEqual(await buttons.allTextContents(), [customQuestions[0]]);
+  customQuestions = [];
+  await page.reload();
+  await ask();
+  assert.equal(await followUps.isVisible(), false);
+
+  await page.unroute("**/chat/stream", citeReply);
+  await page.route("**/chat/stream", route => route.fulfill({
+    contentType: "text/event-stream",
+    body: 'data: {"type":"delta","text":"部分回答"}\n\ndata: {"type":"error"}\n\n'
+  }));
+  customQuestions = ["你怎样改进岸线协作台？"];
+  await page.reload();
+  const input = page.locator("#chat-input");
+  await input.fill("验证中断情况");
+  await input.press("Enter");
+  await page.getByText("回答未完成，请重新发送。", { exact: true }).waitFor();
+  assert.equal(await followUps.isVisible(), false);
 
   await page.goto(new URL("resume.html", site.url).href);
   await page.emulateMedia({ media: "print" });
@@ -73,4 +117,4 @@ try {
   await browser?.close();
   await site?.close();
 }
-console.log("Mobile homepage, local Agent SSE, citation links, and A4 résumé passed in Chromium.");
+console.log("Mobile homepage, local Agent SSE, follow-up questions, citation links, and A4 résumé passed in Chromium.");

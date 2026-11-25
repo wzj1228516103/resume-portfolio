@@ -15,10 +15,18 @@
   const output = select("chat-answer-output");
   const draft = select("chat-answer-draft");
   const markdown = select("chat-answer-markdown");
+  const followUps = select("chat-follow-ups");
   const english = /^en(?:-|$)/i.test(document.documentElement.lang);
   const copy = english ? {
     title: "AI chat", answer: "AI reply", clear: "Close reply", stop: "Stop reply",
     source: "Source", portfolio: "Portfolio", resume: "Résumé",
+    followUpLabel: "You can also ask",
+    followUpQuestions: [
+      "Which of your projects best represents your work?",
+      "What skills do you use most often?",
+      "What do you usually take responsibility for on a project?",
+      "Can you describe a challenge you solved on a project?",
+    ],
     prompt: "Ask about projects or experience", send: "Send",
     offline: "The AI chat service is not connected yet.",
     config: "The AI chat configuration is incomplete.",
@@ -28,6 +36,13 @@
   } : {
     title: "AI 问答", answer: "AI 回答", clear: "关闭回答", stop: "停止回答",
     source: "来源", portfolio: "作品集", resume: "简历",
+    followUpLabel: "你还可以问",
+    followUpQuestions: [
+      "哪个项目最能代表你的工作？",
+      "你最常用哪些技能？",
+      "你在项目里通常负责什么？",
+      "可以分享一次解决项目难题的经历吗？",
+    ],
     prompt: "询问项目或经历", send: "发送",
     offline: "AI 问答服务尚未接入。",
     config: "AI 问答配置未完成。",
@@ -67,6 +82,17 @@
   footer.hidden = false;
   if (!ready) return;
 
+  const normalizeQuestion = text => text.trim().replace(/\s*[?？.!。！]+$/u, "").toLowerCase();
+  const customQuestions = window.RESUME?.followUpQuestions;
+  const choices = Array.isArray(customQuestions) ? customQuestions : copy.followUpQuestions;
+  const questions = new Map();
+  for (const question of choices) {
+    if (typeof question !== "string") continue;
+    const text = question.trim();
+    const key = normalizeQuestion(text);
+    if (key && text.length <= input.maxLength && !questions.has(key)) questions.set(key, text);
+  }
+
   let sessionId;
   let visitor;
   let active;
@@ -78,10 +104,37 @@
     draft.textContent = "";
     markdown.hidden = true;
     markdown.replaceChildren();
+    if (followUps) {
+      followUps.hidden = true;
+      followUps.replaceChildren();
+    }
     clear.hidden = true;
   }
 
-  function showAnswer(text, final) {
+  function showFollowUps(message) {
+    if (!followUps || !questions.size) return;
+    const entries = [...questions.entries()];
+    const asked = entries.findIndex(([key]) => key === normalizeQuestion(message));
+    const suggestions = [...entries.slice(asked + 1), ...entries.slice(0, Math.max(0, asked))].slice(0, 3);
+    if (!suggestions.length) return;
+
+    const label = document.createElement("p");
+    label.className = "chat-follow-ups-label";
+    label.id = "chat-follow-ups-label";
+    label.textContent = copy.followUpLabel;
+    const buttons = suggestions.map(([, question]) => {
+      const button = document.createElement("button");
+      button.className = "chat-follow-up";
+      button.type = "button";
+      button.textContent = question;
+      button.addEventListener("click", () => ask(question));
+      return button;
+    });
+    followUps.replaceChildren(label, ...buttons);
+    followUps.hidden = false;
+  }
+
+  function showAnswer(text, final, message) {
     if (!text.trim()) return;
     const follow = region.hidden || output.scrollHeight - output.scrollTop - output.clientHeight < 36;
     region.hidden = false;
@@ -96,6 +149,7 @@
         }
       } catch { /* Keep the plain-text reply. */ }
     }
+    if (final) showFollowUps(message);
     if (follow) output.scrollTop = output.scrollHeight;
   }
 
@@ -167,14 +221,10 @@
     if (event.key === "Escape" && !clear.hidden && !document.querySelector("dialog[open]")) clear.click();
   });
 
-  form.addEventListener("submit", async event => {
-    event.preventDefault();
-    const message = input.value.trim();
-    if (active || !message) return;
-
+  async function ask(message) {
+    if (active) return;
     clearAnswer();
     announcement.textContent = "";
-    input.value = "";
     input.disabled = send.disabled = send.hidden = true;
     stop.hidden = false;
     const controller = new AbortController();
@@ -193,14 +243,15 @@
         status.textContent = "";
         showAnswer(text);
       });
+      signal.throwIfAborted();
       if (typeof final.sessionId === "string") sessionId = final.sessionId;
       if (typeof final.text === "string" && final.text.trim()) text = final.text;
-      showAnswer(text, final);
+      showAnswer(text, final, message);
       status.textContent = text.trim() ? "" : copy.empty;
       if (text.trim()) announcement.textContent = copy.complete;
     } catch {
       status.textContent = controller.signal.aborted ? copy.stopped : copy.error;
-      if (!controller.signal.aborted) input.value = message;
+      if (!controller.signal.aborted && !input.value) input.value = message;
     } finally {
       const restoreFocus = [document.body, stop, input].includes(document.activeElement);
       active = undefined;
@@ -210,5 +261,13 @@
       send.disabled = !input.value.trim();
       if (restoreFocus) input.focus({ preventScroll: true });
     }
+  }
+
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    const message = input.value.trim();
+    if (active || !message) return;
+    input.value = "";
+    ask(message);
   });
 })();

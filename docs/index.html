@@ -7,14 +7,14 @@
   <meta name="description" content="个人简历与项目">
   <title>个人简历与项目</title>
   <link rel="stylesheet" href="./style.css">
-  <link rel="stylesheet" href="./chat.css">
+  <link rel="stylesheet" href="./chat.css?v=follow-up-questions">
   <script defer src="./resume.js"></script>
   <script defer src="./render.js"></script>
   <script defer src="./chat-config.js"></script>
   <script defer src="./chat-marked.js"></script>
   <script defer src="./chat-markdown.js"></script>
   <script defer src="./chat-challenge.js"></script>
-  <script defer src="./chat.js"></script>
+  <script defer src="./chat.js?v=follow-up-questions"></script>
   <script defer src="./motion/three-0.150.1.min.js"></script>
   <script defer src="./motion/fluid.js"></script>
   <script defer src="./motion/particles.js"></script>
@@ -54,6 +54,7 @@
     <div class="chat-answer-output" id="chat-answer-output" tabindex="0">
       <div class="chat-answer-draft" id="chat-answer-draft"></div>
       <div class="chat-answer-markdown" id="chat-answer-markdown" hidden></div>
+      <div class="chat-follow-ups" id="chat-follow-ups" role="group" aria-labelledby="chat-follow-ups-label" hidden></div>
     </div>
   </section>
   <footer class="chat-footer" id="chat-footer" aria-label="AI 问答" hidden>

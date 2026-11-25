@@ -29,6 +29,7 @@
 | `lang` | `"zh-CN"` 使用中文界面，`"en"` 使用英语界面。简历正文保留你填写的文字。 |
 | `name`、`role`、`location`、`avatar` | 姓名、职业标题、地点、头像路径。 |
 | `summary` | 简介段落数组，每项一段。 |
+| `followUpQuestions` | AI 回答后的追问建议，填写公开问题的字符串数组，每次最多显示三条。省略时使用通用问题，`[]` 隐藏建议。 |
 | `links` | 联系方式和个人主页。每项填写 `label` 和 `url`，支持 `https:`、`http:`、`mailto:` 和 `tel:`。 |
 | `experience`、`education` | 每项填写 `title`，可补充 `subtitle`（例如机构名）、`period`、`summary`、`bullets`（要点数组）和 `links`。 |
 | `projects` | 每项填写 `title`，可补充 `category`、`stack`、`summary`、`bullets`、`links`、`coverTitle`、`image` 或 `video`。有多个分类时，首页显示筛选按钮。 |
